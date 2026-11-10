@@ -9,8 +9,14 @@
     },
     "t-dbs-hw": {
       "percent": 60,
-      "subtasks": [],
-      "updated": "2026-11-10T20:40:52.244Z"
+      "subtasks": [
+        {
+          "id": "mwb6q8va",
+          "title": "Finish last 2 problems",
+          "done": false
+        }
+      ],
+      "updated": "2026-11-10T21:11:15.053Z"
     }
   }
 }

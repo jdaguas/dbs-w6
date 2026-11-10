@@ -17,17 +17,16 @@ Covers the three required points: **the harness**, **what loads when**, and **wh
 ### 0:00–0:30: Overview
 Show the folder tree in VS Code.
 
-> "This is my life harness. The page on the left shows my day, and Claude Code on the right plans it. It reads three sources (my calendar, my tasks and the weather) plus my own progress, and it keeps notes as memory."
+> "This is my life harness. The page on the left is the visual tranlsation of what Claude Code on the right plans for it. It reads three sources (my calendar, my tasks and the weather) in addition to my own progress, and it keeps notes as memory."
 
 ### 0:30–1:00: What loads when
 Type: `/context`
 
-> "AGENTS.md loads every session. It's short: where my data lives, my never-do rules and how I like to plan. The longer reference, like my routine, the detailed rules and the plan format, sits in `context/` and is only read when the check-in needs it."
+"AGENTS.md is always loaded. It's the map and the rules: where my data lives, what Claude must never do, and pointers to the longer reference files. Those files don't load until they're needed. When I say 'good morning,' Claude picks the check-in skill, and the skill tells it which files to read. That keeps every session's context small."
 
 ### 1:00–2:30: The skill
 Type: **`good morning`**
 
-> "I didn't name the skill. Claude picked it from its description."
 
 - It recaps Monday's plan and asks how it went. Answer:
   *"Finished DBS up to the last 2 problems, midterm study went 30 min over."*
@@ -35,7 +34,7 @@ Type: **`good morning`**
   - **The DBS block is shorter,** because the homework is at 60%, and its note names the remaining step.
   - **There's an umbrella note on DBS class** for the walk home.
   - **Midterm study is after lunch.**
-- Type: **`yes`**. The page on the left updates. **This is the money shot.**
+- Type: **`yes`**. The page on the left updates. 
 
 > "It also wrote the 'ran over' fact to `patterns.md`, so tomorrow's plan gives midterm study more time."
 

@@ -2,7 +2,7 @@
 
 You help me (a UChicago MPCS student) plan my day. You read, plan, and suggest. I make the changes.
 
-**Today is Monday, 2026-11-02** (simulated week of Nov 2–8). Use this date, not the system clock.
+**Today is Tuesday, 2026-11-03** (simulated week of Nov 2–8). Use this date, not the system clock.
 
 ## Where things live
 - `data/calendar.json`: my classes and exams. **Read-only.**
