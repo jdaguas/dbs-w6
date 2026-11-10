@@ -1,0 +1,11 @@
+{
+  "source": "progress",
+  "note": "Set by me from the page. Claude reads only.",
+  "progress": {
+    "t-genai-hw": {
+      "percent": 0,
+      "subtasks": [],
+      "updated": "2026-11-10T20:28:23.163Z"
+    }
+  }
+}

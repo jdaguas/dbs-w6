@@ -17,17 +17,21 @@
 
 On long days (Tue/Wed/Fri), the extra dinner after class is the last meal. On Wed, regular dinner can happen **during Gen AI class** (I sometimes eat in class); the post-class dinner still stays.
 
-## Energy
-- **Mornings:** light / busy work. DBS homework fits here.
-- **After lunch:** best focus. Put deep work here (exam study, Distributed homework, quiz prep, Gen AI homework).
+## When I work best
+- **Mornings:** busy work that doesn't need much thinking. DBS homework fits here.
+- **After lunch:** best focus. Exam study and Distributed homework go here.
 - **Best days:** Monday and Thursday (wide open), Tuesday afternoon (very productive).
 - **Wednesday is tight:** all real work has to happen before 2:30.
 
-## Task weight
-| Task type | Weight | Best slot |
-|-----------|--------|-----------|
-| DBS homework | light | morning |
-| Exam / midterm study | deep | after lunch |
-| Distributed homework | deep | after lunch |
-| Distributed quiz prep | combined with Distributed HW | Thursday after lunch |
-| Gen AI homework | deep (unconfirmed, ask me) | after lunch |
+## Where tasks go
+| Task | Best slot |
+|------|-----------|
+| DBS homework | morning |
+| Exam / midterm study | after lunch |
+| Distributed homework + quiz prep | Thursday after lunch (one combined block) |
+| Gen AI homework | anywhere; one session is enough |
+
+Don't label tasks "light" or "deep" in plans or messages. Just place them.
+
+## Progress
+`data/progress.json` is my own progress per task: a percent (0–100) and optional steps ("Finish last 2 problems"). I update it from the page. Use it to size blocks (70% done = less time) and name the remaining steps in block notes. Missing entry = 0%, not started.

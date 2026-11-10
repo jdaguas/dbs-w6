@@ -9,7 +9,7 @@ Save each approved plan to `plans/YYYY-MM-DD.json`. Also copy it to `plans/lates
   "summary": "Midterm prep · DBS HW due tomorrow",
   "recap": "Studied ~2 hrs Sat and Sun for the midterm.",
   "blocks": [
-    { "start": "10:00", "end": "12:00", "title": "DBS homework", "kind": "work", "weight": "light", "task_id": "t-dbs-hw", "note": "Finish and submit before Tuesday class" },
+    { "start": "10:00", "end": "12:00", "title": "DBS homework", "kind": "work", "task_id": "t-dbs-hw", "note": "Finish and submit before Tuesday class" },
     { "start": "12:30", "end": "13:30", "title": "Lunch", "kind": "meal" },
     { "start": "17:30", "end": "19:30", "title": "DBS class", "kind": "class" },
     { "start": "20:00", "end": "21:00", "title": "Dinner", "kind": "meal" }

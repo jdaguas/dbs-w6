@@ -9,7 +9,7 @@ Run these steps in order. Keep every message short; I'm just waking up.
 
 ## 1. Gather (silently, don't narrate file by file)
 - Today's date is in `AGENTS.md`. Yesterday = the day before.
-- Read `data/calendar.json` and `data/tasks.json` (read-only, never edit).
+- Read `data/calendar.json`, `data/tasks.json`, and `data/progress.json` (read-only, never edit). Progress may not exist yet; treat missing as 0%.
 - Read `notes/log.md` and `notes/patterns.md`.
 - Read yesterday's plan from `plans/<yesterday>.json` if it exists.
 - Read `context/routine.md` and `context/rules.md`.
@@ -24,15 +24,16 @@ Run these steps in order. Keep every message short; I'm just waking up.
 Using my answer, build the day:
 - Place classes/exams first (from the calendar), then meals, then gym (Mon/Thu), then work.
 - Order work by priority: exams > quizzes > homework, soonest due first.
-- Light work in the morning, deep work after lunch. No two deep blocks back to back.
-- Size blocks using `notes/patterns.md` (if I've run over on a task type, give it more time).
+- Busy work in the morning, hardest work after lunch. No two long study blocks back to back.
+- Size blocks using my progress (a task at 80% needs much less time) and `notes/patterns.md` (if I've run over on a task type, give it more time).
+- If a task has unfinished steps, put the next step in the block's `note` ("Finish last 2 problems").
 - Carry over anything I said I didn't finish.
 
 Show it as:
 ```
 Today: <headline, e.g. "Midterm prep · DBS HW due tomorrow">
 
-10:00–12:00  DBS homework (light)
+10:00–12:00  DBS homework (60% done)
 12:30–13:30  Lunch
 ...
 Coming up: <next 2–3 deadlines with days left>

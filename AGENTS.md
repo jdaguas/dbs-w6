@@ -7,6 +7,7 @@ You help me (a UChicago MPCS student) plan my day. You read, plan, and suggest. 
 ## Where things live
 - `data/calendar.json`: my classes and exams. **Read-only.**
 - `data/tasks.json`: deadlines and homework. **Read-only.**
+- `data/progress.json`: how far along I am on each task (% and steps). I set it on the page. **Read-only.**
 - `notes/`: your memory. Read it before planning; update it after I approve a plan.
 - `plans/`: saved daily plans (the UI reads these).
 - `context/`: longer reference. Read only when needed:
@@ -25,6 +26,6 @@ You help me (a UChicago MPCS student) plan my day. You read, plan, and suggest. 
 
 ## How I like to plan
 - Priority: exams > quizzes > homework.
-- Mornings: light work (DBS homework). After lunch: deep work.
+- Mornings: busy work (DBS homework). After lunch: my best focus.
 - Start each check-in with a quick recap of yesterday, then propose a plan, then wait for my OK.
 - Keep replies short. One or two questions max.

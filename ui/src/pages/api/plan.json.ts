@@ -14,9 +14,10 @@ async function json(file: string) {
 }
 
 export const GET: APIRoute = async ({ url }) => {
-  const [calendar, tasks, latest, agents] = await Promise.all([
+  const [calendar, tasks, progress, latest, agents] = await Promise.all([
     json(path.join(ROOT, 'data', 'calendar.json')),
     json(path.join(ROOT, 'data', 'tasks.json')),
+    json(path.join(ROOT, 'data', 'progress.json')),
     json(path.join(PLANS, 'latest.json')),
     readFile(path.join(ROOT, 'AGENTS.md'), 'utf8').catch(() => ''),
   ]);
@@ -44,5 +45,6 @@ export const GET: APIRoute = async ({ url }) => {
     events: calendar?.events ?? [],
     recurring: calendar?.recurring ?? [],
     tasks: tasks?.tasks ?? [],
+    progress: progress?.progress ?? {},
   });
 };
