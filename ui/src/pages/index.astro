@@ -37,7 +37,17 @@ import '../styles/global.css';
             <h2 class="label !mb-0">Schedule</h2>
             <span id="status" class="text-xs text-stone-400"></span>
           </div>
-          <ol id="blocks" class="overflow-hidden rounded-2xl ring-1 ring-stone-200"></ol>
+          <div id="sky" class="relative overflow-hidden rounded-2xl p-2 ring-1 ring-stone-200 transition-[background] duration-1000">
+            <div id="orb" class="pointer-events-none absolute rounded-full transition-all duration-1000"></div>
+            <ol id="blocks" class="relative space-y-2"></ol>
+            <!-- The line is thin; the wrapper gives a taller invisible hover zone. Time shows only on hover. -->
+            <div id="nowbar" class="group absolute inset-x-0 z-10 hidden -translate-y-1/2 cursor-default py-2 transition-[top] duration-1000">
+              <div class="relative h-0.5 bg-rose-500/40 shadow-[0_0_6px_rgba(244,63,94,.25)] transition-colors group-hover:bg-rose-500/80">
+                <span class="absolute -left-0.5 -top-[5px] h-3 w-3 rounded-full bg-rose-500/60 ring-2 ring-white/60"></span>
+                <span id="nowlabel" class="pointer-events-none absolute -top-7 left-3 rounded-full bg-rose-500 px-2 py-0.5 text-xs font-semibold text-white opacity-0 shadow transition-opacity duration-150 group-hover:opacity-100"></span>
+              </div>
+            </div>
+          </div>
         </section>
 
         <!-- Rules bent -->
@@ -122,24 +132,78 @@ import '../styles/global.css';
         }
         return { css: '#0f172a', dark: true };
       }
-      // Small horizon picture: the sun arcs left→right and peaks at midday; the moon takes over at night.
-      function skyIcon(t: number, dark: boolean) {
-        const W = 40, H = 26, horizon = 20;
-        const line = `<line x1="0" y1="${horizon}" x2="${W}" y2="${horizon}" stroke="${dark ? '#64748b' : '#a8a29e'}" stroke-width="1"/>`;
-        if (t >= RISE - 20 && t <= SET + 20) {
-          const f = Math.min(1, Math.max(0, (t - RISE) / (SET - RISE)));
-          const x = 6 + f * (W - 12);
-          const y = horizon - Math.sin(Math.PI * f) * 14;
-          const low = f < 0.12 || f > 0.88;
-          return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><defs><clipPath id="c"><rect width="${W}" height="${horizon}"/></clipPath></defs>
-            <g clip-path="url(#c)"><circle cx="${x}" cy="${y}" r="${low ? 7 : 5}" fill="${low ? '#fb923c' : '#facc15'}" opacity=".35"/><circle cx="${x}" cy="${y}" r="${low ? 5 : 3.5}" fill="${low ? '#f97316' : '#eab308'}"/></g>${line}</svg>`;
+      // Current time of day in minutes. `?now=14:30` in the URL overrides it for testing.
+      function nowMinutes() {
+        const o = new URLSearchParams(location.search).get('now');
+        if (o && /^\d{1,2}:\d{2}$/.test(o)) return toMin(o);
+        const d = new Date();
+        return d.getHours() * 60 + d.getMinutes();
+      }
+
+      // One big sun or moon for right now: rises on the left, peaks in the middle at noon, sets on the right.
+      function paintSky(t: number) {
+        const sky = $('sky'), orb = $('orb');
+        const top = skyColor(t), bottom = skyColor(t + 75);
+        sky.style.background = `linear-gradient(to bottom, ${top.css}, ${bottom.css})`;
+
+        const day = t >= RISE - 15 && t <= SET + 15;
+        const f = day
+          ? (t - RISE) / (SET - RISE)
+          : ((t < RISE ? t + 1440 : t) - SET) / (RISE + 1440 - SET);
+        const ff = Math.min(1, Math.max(0, f));
+        const size = 150;
+        const W = sky.clientWidth, H = Math.max(sky.clientHeight, 260);
+        const lift = Math.sin(Math.PI * ff); // 0 at the horizon, 1 at the top of the arc
+        orb.style.width = orb.style.height = `${size}px`;
+        orb.style.left = `${ff * W - size / 2}px`;
+        orb.style.top = `${(1 - lift) * (H * 0.75) - size * 0.25}px`;
+
+        if (day) {
+          const low = lift < 0.35;
+          orb.style.background = low
+            ? 'radial-gradient(circle, #fb923c 0 38%, rgba(251,146,60,.35) 39% 55%, transparent 70%)'
+            : 'radial-gradient(circle, #fde047 0 36%, rgba(253,224,71,.4) 37% 52%, transparent 70%)';
+          orb.style.boxShadow = 'none';
+        } else {
+          // Crescent: a pale disc with a sky-colored disc offset over it.
+          orb.style.background = `radial-gradient(circle at 64% 36%, ${top.css} 0 30%, transparent 31%), radial-gradient(circle, #f1f5f9 0 36%, rgba(241,245,249,.18) 37% 52%, transparent 70%)`;
         }
-        const nt = t < RISE ? t + 1440 : t;
-        const f = Math.min(1, Math.max(0, (nt - SET) / (RISE + 1440 - SET)));
-        const x = 6 + f * (W - 12), y = horizon - Math.sin(Math.PI * f) * 13;
-        return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
-          <circle cx="8" cy="5" r=".8" fill="#e2e8f0"/><circle cx="31" cy="8" r=".7" fill="#e2e8f0"/><circle cx="21" cy="3" r=".6" fill="#e2e8f0"/>
-          <circle cx="${x}" cy="${y}" r="4.5" fill="#f1f5f9"/><circle cx="${x + 2.2}" cy="${y - 1.4}" r="3.8" fill="${skyColor(t).css}"/>${line}</svg>`;
+      }
+
+      // Slide the "now" line down the schedule and tag the current or next block.
+      function updateNow() {
+        if (!current) return;
+        const t = nowMinutes();
+        paintSky(t);
+        const bar = $('nowbar');
+        const rows = [...$('blocks').querySelectorAll<HTMLElement>('[data-start]')];
+        rows.forEach((r) => { r.classList.remove('ring-2', 'ring-rose-400'); r.querySelector('[data-tag]')!.innerHTML = ''; });
+        if (current.date !== current.today || !rows.length) { bar.classList.add('hidden'); return; }
+
+        const skyTop = $('sky').getBoundingClientRect().top;
+        const box = (r: HTMLElement) => { const b = r.getBoundingClientRect(); return { top: b.top - skyTop, bottom: b.bottom - skyTop }; };
+        let y = 0, tag: HTMLElement | null = null, label = '';
+        const at = rows.findIndex((r) => t >= toMin(r.dataset.start!) && t < toMin(r.dataset.end!));
+        if (at >= 0) {
+          const r = rows[at], s = toMin(r.dataset.start!), e = toMin(r.dataset.end!), b = box(r);
+          y = b.top + ((t - s) / (e - s)) * (b.bottom - b.top);
+          tag = r; label = 'Now';
+        } else {
+          const next = rows.findIndex((r) => toMin(r.dataset.start!) > t);
+          if (next === -1) y = box(rows[rows.length - 1]).bottom + 4;
+          else {
+            y = next === 0 ? box(rows[0]).top - 4 : (box(rows[next - 1]).bottom + box(rows[next]).top) / 2;
+            const mins = toMin(rows[next].dataset.start!) - t;
+            tag = rows[next]; label = `Up next · ${mins < 60 ? `${mins} min` : `${Math.floor(mins / 60)}h ${mins % 60}m`}`;
+          }
+        }
+        bar.style.top = `${y}px`;
+        bar.classList.remove('hidden');
+        $('nowlabel').textContent = time(`${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}`);
+        if (tag) {
+          tag.classList.add('ring-2', 'ring-rose-400');
+          tag.querySelector('[data-tag]')!.innerHTML = `<span class="rounded-full bg-rose-500 px-2 py-0.5 text-xs font-semibold text-white">${label}</span>`;
+        }
       }
 
       // ---------- Importance ----------
@@ -156,13 +220,9 @@ import '../styles/global.css';
 
       // ---------- Schedule rows ----------
       function row(b: Block, course: string | undefined, type: string | undefined) {
-        const s = skyColor(toMin(b.start)), e = skyColor(toMin(b.end));
-        const dark = s.dark;
-        const main = dark ? 'text-white' : 'text-stone-900';
-        const sub = dark ? 'text-slate-300' : 'text-stone-500';
+        const sub = 'text-stone-500';
         const exam = b.kind === 'exam';
-        return `<li class="flex items-start gap-3 px-4 py-3 ${main}" style="background:linear-gradient(to bottom, ${s.css}, ${e.css})">
-          <span class="shrink-0 pt-0.5">${skyIcon(toMin(b.start), dark)}</span>
+        return `<li data-start="${b.start}" data-end="${b.end}" class="flex items-start gap-3 rounded-xl bg-white/80 px-4 py-3 text-stone-900 shadow-sm backdrop-blur-sm">
           <span class="w-[4.5rem] shrink-0 pt-0.5 text-sm tabular-nums ${sub}">${time(b.start)}</span>
           <div class="min-w-0 flex-1">
             <div class="flex flex-wrap items-baseline gap-x-2">
@@ -171,7 +231,7 @@ import '../styles/global.css';
             </div>
             ${b.note ? `<p class="mt-0.5 text-sm ${sub}">${esc(b.note)}</p>` : ''}
           </div>
-          <div class="flex shrink-0 flex-col items-end gap-1 pt-0.5">${importanceBadge(exam ? 'exam' : type)}${pill(course)}</div>
+          <div class="flex shrink-0 flex-col items-end gap-1 pt-0.5"><span data-tag></span>${importanceBadge(exam ? 'exam' : type)}${pill(course)}</div>
         </li>`;
       }
 
@@ -268,7 +328,7 @@ import '../styles/global.css';
           $('status').textContent = 'Not planned yet';
           $('blocks').innerHTML = todaysEvents.length
             ? todaysEvents.map((e) => row({ ...e, kind: e.type }, e.course, e.type)).join('')
-            : `<li class="bg-white px-4 py-6 text-center text-sm text-stone-400">No classes. ${isToday ? 'Say <span class="font-mono text-stone-600">good morning</span> in Claude Code to plan the day.' : ''}</li>`;
+            : `<li class="rounded-xl bg-white/80 px-4 py-6 text-center text-sm text-stone-400">No classes. ${isToday ? 'Say <span class="font-mono text-stone-600">good morning</span> in Claude Code to plan the day.' : ''}</li>`;
         }
 
         const ex = plan?.exceptions ?? [];
@@ -291,6 +351,7 @@ import '../styles/global.css';
         const carried = plan?.carried_over ?? [];
         $('carried-wrap').classList.toggle('hidden', !carried.length);
         $('carried').innerHTML = carried.map((s) => `<li class="rounded-xl border border-dashed border-stone-300 px-4 py-2 text-sm text-stone-600">${esc(s)}</li>`).join('');
+        requestAnimationFrame(updateNow);
       }
 
       // ---------- Saving progress (I make this change, not Claude) ----------
@@ -360,6 +421,8 @@ import '../styles/global.css';
       $('title').addEventListener('click', () => { viewing = null; load(); });
       load();
       setInterval(load, 2000);
+      setInterval(updateNow, 30000);
+      addEventListener('resize', updateNow);
     </script>
   </body>
 </html>
