@@ -62,7 +62,7 @@ import '../styles/global.css';
           </div>
           <div id="sky" class="relative overflow-hidden rounded-2xl p-2 ring-1 ring-slate-400/30 transition-[background] duration-1000">
             <div id="orb" class="pointer-events-none absolute rounded-full transition-all duration-1000"></div>
-            <ol id="blocks" class="relative space-y-2"></ol>
+            <ol id="blocks" class="relative space-y-1.5"></ol>
             <!-- The line is thin; the wrapper gives a taller invisible hover zone. Time shows only on hover. -->
             <div id="nowbar" class="group absolute inset-x-0 z-10 hidden -translate-y-1/2 cursor-default py-2 transition-[top] duration-1000">
               <div class="relative h-0.5 bg-rose-500/40 shadow-[0_0_6px_rgba(244,63,94,.25)] transition-colors group-hover:bg-rose-500/80">
@@ -80,16 +80,12 @@ import '../styles/global.css';
         </section>
 
         <!-- Tasks -->
-        <section class="mt-6">
+        <section class="mt-8 border-t border-slate-400/40 pt-6">
           <div class="mb-2 flex items-baseline justify-between">
-            <h2 class="label !mb-0">Due</h2>
+            <h2 class="label !mb-0">This week <span id="due-count" class="ml-1 rounded-full bg-slate-700 px-1.5 py-0.5 text-[10px] text-white"></span></h2>
             <span class="text-xs text-slate-500">Tap a task to update progress</span>
           </div>
-          <ul id="tasks" class="divide-y divide-slate-300/50 overflow-hidden rounded-2xl bg-[#e6edf4]/80 ring-1 ring-slate-400/30"></ul>
-          <details id="past-wrap" class="mt-3 hidden text-sm text-slate-500">
-            <summary class="cursor-pointer select-none">Already due (<span id="past-count"></span>)</summary>
-            <ul id="past" class="mt-2 space-y-1 pl-4"></ul>
-          </details>
+          <div id="tasks"></div>
         </section>
 
         <!-- Carried over -->
@@ -201,7 +197,7 @@ import '../styles/global.css';
         paintSky(t);
         const bar = $('nowbar');
         const rows = [...$('blocks').querySelectorAll<HTMLElement>('[data-start]')];
-        rows.forEach((r) => { r.classList.remove('ring-2', 'ring-rose-400'); r.querySelector('[data-tag]')!.innerHTML = ''; });
+        rows.forEach((r) => { r.querySelector('[data-card]')?.classList.remove('ring-2', 'ring-rose-400'); r.querySelector('[data-tag]')!.innerHTML = ''; });
         if (current.date !== current.today || !rows.length) { bar.classList.add('hidden'); return; }
 
         const skyTop = $('sky').getBoundingClientRect().top;
@@ -225,7 +221,7 @@ import '../styles/global.css';
         bar.classList.remove('hidden');
         $('nowlabel').textContent = time(`${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}`);
         if (tag) {
-          tag.classList.add('ring-2', 'ring-rose-400');
+          tag.querySelector('[data-card]')?.classList.add('ring-2', 'ring-rose-400');
           tag.querySelector('[data-tag]')!.innerHTML = `<span class="rounded-full bg-rose-500 px-2 py-0.5 text-xs font-semibold text-white">${label}</span>`;
         }
       }
@@ -243,11 +239,24 @@ import '../styles/global.css';
       }
 
       // ---------- Schedule rows ----------
+      // Timeline: time chip on the sky, a rail with a dot per block, and a card whose height follows the duration.
+      const DOT: Record<string, string> = {
+        class: 'bg-indigo-500', exam: 'bg-rose-600', work: 'bg-slate-700', meal: 'bg-emerald-500',
+        gym: 'bg-sky-500', break: 'bg-slate-300', buffer: 'bg-slate-300',
+      };
       function row(b: Block, course: string | undefined, type: string | undefined) {
         const sub = 'text-slate-600';
         const exam = b.kind === 'exam';
-        return `<li data-start="${b.start}" data-end="${b.end}" class="flex items-start gap-3 rounded-xl bg-[#e6edf4]/85 px-4 py-3 text-slate-900 shadow-sm backdrop-blur-sm">
-          <span class="w-[4.5rem] shrink-0 pt-0.5 text-sm tabular-nums ${sub}">${time(b.start)}</span>
+        const height = Math.max(52, (toMin(b.end) - toMin(b.start)) * 0.7);
+        return `<li data-start="${b.start}" data-end="${b.end}" class="flex gap-2" style="min-height:${height}px">
+          <div class="w-[4.25rem] shrink-0 pt-2.5 text-right">
+            <span class="rounded-md bg-[#e6edf4]/85 px-1.5 py-0.5 text-xs font-semibold tabular-nums text-slate-700 shadow-sm">${time(b.start)}</span>
+          </div>
+          <div class="relative w-4 shrink-0">
+            <span class="absolute inset-y-[-6px] left-1/2 w-0.5 -translate-x-1/2 bg-white/45"></span>
+            <span class="absolute left-1/2 top-3 h-3 w-3 -translate-x-1/2 rounded-full ring-2 ring-white/90 ${DOT[b.kind] ?? DOT.work}"></span>
+          </div>
+          <div data-card class="flex min-w-0 flex-1 items-start gap-3 rounded-xl bg-[#e6edf4]/85 px-4 py-2.5 text-slate-900 shadow-sm backdrop-blur-sm">
           <div class="min-w-0 flex-1">
             <div class="flex flex-wrap items-baseline gap-x-2">
               <span class="${exam ? 'font-bold' : 'font-medium'} ${b.kind === 'buffer' || b.kind === 'break' ? 'opacity-60' : ''}">${esc(b.title)}</span>
@@ -256,68 +265,92 @@ import '../styles/global.css';
             ${b.note ? `<p class="mt-0.5 text-sm ${sub}">${esc(b.note)}</p>` : ''}
           </div>
           <div class="flex shrink-0 flex-col items-end gap-1 pt-0.5"><span data-tag></span>${importanceBadge(exam ? 'exam' : type)}${pill(course)}</div>
+          </div>
         </li>`;
       }
 
-      // ---------- Tasks with progress + subtasks ----------
-      const open = new Set<string>();
+      // ---------- Tasks: a M–F week board, with a detail panel for the selected task ----------
+      let selected: string | null = null;
       let current: Data | null = null;
 
-      function ring(pct: number) {
-        const r = 8, c = 2 * Math.PI * r;
-        const color = pct >= 100 ? '#059669' : '#44403c';
-        return `<svg width="22" height="22" viewBox="0 0 22 22" class="shrink-0 -rotate-90">
-          <circle cx="11" cy="11" r="${r}" fill="none" stroke="#cbd5e1" stroke-width="3"/>
-          ${pct > 0 ? `<circle cx="11" cy="11" r="${r}" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round"
-            stroke-dasharray="${(pct / 100) * c} ${c}"/>` : ''}</svg>`;
+      function bar(pct: number) {
+        return `<div class="mt-1.5 flex items-center gap-1.5">
+          <div class="h-1 flex-1 overflow-hidden rounded-full bg-slate-300/70">
+            <div class="h-full rounded-full ${pct >= 100 ? 'bg-emerald-600' : 'bg-slate-700'}" style="width:${pct}%"></div>
+          </div>
+          <span class="text-[10px] tabular-nums text-slate-600">${pct}%</span>
+        </div>`;
       }
 
-      function taskItem(t: Task, d: Data, planned: Map<string, Block>) {
+      function card(t: Task, d: Data, planned: Map<string, Block>) {
         const p = d.progress[t.id] ?? { percent: 0, subtasks: [] };
         const n = daysBetween(d.date, t.due.slice(0, 10));
-        const due = time(t.due.slice(11, 16));
-        const when = n === 0 ? `Today ${due}` : n === 1 ? `Tomorrow ${due}` : `${day(t.due.slice(0, 10), { weekday: 'short' })} ${due}`;
         const b = planned.get(t.id);
-        const doneTask = p.percent >= 100;
-        const cover = doneTask ? `<span class="text-xs text-emerald-700">Done</span>`
-          : !d.plan ? '' : b ? `<span class="text-xs text-emerald-700">Planned ${time(b.start)}</span>`
-          : n <= 1 ? `<span class="text-xs font-medium text-amber-700">Not scheduled today</span>` : '';
+        const done = p.percent >= 100;
+        const cover = done ? `<span class="text-emerald-700">Done</span>`
+          : n < 0 || !d.plan ? '' : b ? `<span class="text-emerald-700">Planned ${time(b.start)}</span>`
+          : n <= 1 ? `<span class="font-medium text-amber-700">Not scheduled</span>` : '';
         const left = p.subtasks.filter((s) => !s.done).length;
-        const isOpen = open.has(t.id);
         const imp = IMPORTANCE[t.type];
+        const isSel = selected === t.id;
+        return `<button data-task="${t.id}" data-act="toggle"
+            class="block w-full rounded-lg border-l-4 ${imp ? imp.edge : 'border-l-slate-400/50'} bg-[#eef3f8] p-2 text-left shadow-sm transition
+            ${isSel ? 'ring-2 ring-slate-700' : 'ring-1 ring-slate-300/70 hover:ring-slate-500'} ${n < 0 ? 'opacity-55' : ''}">
+          <div class="text-[13px] font-medium leading-snug ${done ? 'text-slate-500 line-through' : ''}">${esc(t.title)}</div>
+          <div class="mt-0.5 text-[11px] ${n >= 0 && n <= 1 && !done ? 'font-medium text-rose-600' : 'text-slate-600'}">${time(t.due.slice(11, 16))}</div>
+          ${bar(p.percent)}
+          ${imp || t.course ? `<div class="mt-1.5 flex flex-wrap gap-1 [&>span]:!text-[10px]">${importanceBadge(t.type)}${pill(t.course)}</div>` : ''}
+          ${cover || p.subtasks.length ? `<div class="mt-1 space-x-1 text-[10px] text-slate-600">${p.subtasks.length ? `<span>${left ? `${left} left` : 'Steps done'}</span>` : ''}${cover}</div>` : ''}
+        </button>`;
+      }
 
-        return `<li data-task="${t.id}" class="border-l-4 ${imp ? imp.edge : 'border-l-transparent'}">
-          <button data-act="toggle" class="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-[#d3dee9]/60">
-            ${ring(p.percent)}
-            <div class="min-w-0 flex-1">
-              <div class="font-medium ${doneTask ? 'text-slate-500 line-through' : ''}">${esc(t.title)}</div>
-              <div class="flex flex-wrap gap-x-3 text-xs text-slate-600">
-                <span class="tabular-nums">${p.percent}%</span>
-                ${p.subtasks.length ? `<span>${left ? `${left} step${left > 1 ? 's' : ''} left` : 'All steps done'}</span>` : ''}
-                ${cover}
+      function board(d: Data, planned: Map<string, Block>) {
+        const week = Array.from({ length: 7 }, (_, i) => addDays(d.weekOf, i));
+        const byDay = (iso: string) => d.tasks.filter((t) => t.due.slice(0, 10) === iso).sort((a, b) => a.due.localeCompare(b.due));
+        // Always Mon–Fri; add Sat/Sun only if something is due then.
+        const days = week.filter((iso, i) => i < 5 || byDay(iso).length);
+        const cols = days.map((iso) => {
+          const isView = iso === d.date, past = iso < d.date;
+          const letter = day(iso, { weekday: 'narrow' });
+          const tasks = byDay(iso);
+          return `<div class="min-w-0 rounded-xl p-1.5 ${isView ? 'bg-white/45 ring-1 ring-slate-400/40' : ''}">
+            <div class="mb-2 flex flex-col items-center ${past ? 'opacity-50' : ''}">
+              <span class="text-sm font-bold ${isView ? 'flex h-7 w-7 items-center justify-center rounded-full bg-slate-700 text-white' : 'text-slate-700'}">${letter}</span>
+              <span class="text-[10px] text-slate-500">${Number(iso.slice(8, 10))}</span>
+            </div>
+            <div class="space-y-2">${tasks.map((t) => card(t, d, planned)).join('') || `<div class="py-3 text-center text-xs text-slate-400">—</div>`}</div>
+          </div>`;
+        });
+        return `<div class="grid gap-1.5" style="grid-template-columns:repeat(${days.length},minmax(0,1fr))">${cols.join('')}</div>`;
+      }
+
+      function detail(t: Task, d: Data) {
+        const p = d.progress[t.id] ?? { percent: 0, subtasks: [] };
+        return `<div data-task="${t.id}" class="mt-3 space-y-3 rounded-2xl bg-[#d3dee9] p-4 ring-1 ring-slate-400/40">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <div class="font-semibold">${esc(t.title)}</div>
+              <div class="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-slate-600">
+                ${importanceBadge(t.type)}${pill(t.course)}
+                <span>Due ${day(t.due.slice(0, 10), { weekday: 'long' })} ${time(t.due.slice(11, 16))}</span>
               </div>
             </div>
-            <div class="flex shrink-0 flex-col items-end gap-1">
-              <div class="flex gap-1">${importanceBadge(t.type)}${pill(t.course)}</div>
-              <span class="text-sm ${n <= 1 && !doneTask ? 'font-medium text-rose-600' : 'text-slate-600'}">${when}</span>
-            </div>
-          </button>
-          ${isOpen ? `<div class="space-y-3 bg-[#d3dee9] px-4 pb-4 pt-2">
-            <label class="flex items-center gap-3 text-sm">
-              <span class="w-20 text-slate-600">Progress</span>
-              <input data-act="percent" type="range" min="0" max="100" step="5" value="${p.percent}" class="flex-1 accent-slate-700"/>
-              <output class="w-10 text-right tabular-nums font-medium">${p.percent}%</output>
-            </label>
-            <ul class="space-y-1">
-              ${p.subtasks.map((s) => `<li class="flex items-center gap-2 text-sm">
-                <input data-act="check" data-sub="${s.id}" type="checkbox" ${s.done ? 'checked' : ''} class="h-4 w-4 accent-slate-700"/>
-                <span class="flex-1 ${s.done ? 'text-slate-500 line-through' : ''}">${esc(s.title)}</span>
-                <button data-act="remove" data-sub="${s.id}" class="px-1 text-slate-500 hover:text-rose-600" aria-label="Remove">×</button>
-              </li>`).join('')}
-            </ul>
-            <input data-act="add" type="text" placeholder="Add a step, e.g. Finish last 2 problems" class="w-full rounded-lg bg-[#eef3f8] px-3 py-2 text-sm ring-1 ring-slate-300 focus:outline-none focus:ring-slate-500"/>
-          </div>` : ''}
-        </li>`;
+            <button data-act="toggle" class="px-1 text-lg leading-none text-slate-500 hover:text-slate-800" aria-label="Close">×</button>
+          </div>
+          <label class="flex items-center gap-3 text-sm">
+            <span class="w-20 text-slate-600">Progress</span>
+            <input data-act="percent" type="range" min="0" max="100" step="5" value="${p.percent}" class="flex-1 accent-slate-700"/>
+            <output class="w-10 text-right font-medium tabular-nums">${p.percent}%</output>
+          </label>
+          <ul class="space-y-1">
+            ${p.subtasks.map((s) => `<li class="flex items-center gap-2 text-sm">
+              <input data-act="check" data-sub="${s.id}" type="checkbox" ${s.done ? 'checked' : ''} class="h-4 w-4 accent-slate-700"/>
+              <span class="flex-1 ${s.done ? 'text-slate-500 line-through' : ''}">${esc(s.title)}</span>
+              <button data-act="remove" data-sub="${s.id}" class="px-1 text-slate-500 hover:text-rose-600" aria-label="Remove">×</button>
+            </li>`).join('')}
+          </ul>
+          <input data-act="add" type="text" placeholder="Add a step, e.g. Finish last 2 problems" class="w-full rounded-lg bg-[#eef3f8] px-3 py-2 text-sm ring-1 ring-slate-300 focus:outline-none focus:ring-slate-500"/>
+        </div>`;
       }
 
       function render(d: Data) {
@@ -361,16 +394,11 @@ import '../styles/global.css';
 
         const planned = new Map<string, Block>();
         for (const b of plan?.blocks ?? []) if (b.task_id && !planned.has(b.task_id)) planned.set(b.task_id, b);
-        const sorted = [...d.tasks].sort((a, b) => a.due.localeCompare(b.due));
-        const upcoming = sorted.filter((t) => t.due.slice(0, 10) >= d.date);
-        const past = sorted.filter((t) => t.due.slice(0, 10) < d.date);
-
-        $('tasks').innerHTML = upcoming.map((t) => taskItem(t, d, planned)).join('')
-          || `<li class="px-4 py-6 text-center text-sm text-slate-500">Nothing else due this week.</li>`;
-
-        $('past-wrap').classList.toggle('hidden', !past.length);
-        $('past-count').textContent = String(past.length);
-        $('past').innerHTML = past.map((t) => `<li>${esc(t.title)} · ${(d.progress[t.id]?.percent ?? 0)}%</li>`).join('');
+        const left = d.tasks.filter((t) => t.due.slice(0, 10) >= d.date && (d.progress[t.id]?.percent ?? 0) < 100);
+        $('due-count').textContent = `${left.length} left`;
+        $('due-count').classList.toggle('hidden', !left.length);
+        const sel = d.tasks.find((t) => t.id === selected);
+        $('tasks').innerHTML = board(d, planned) + (sel ? detail(sel, d) : '');
 
         const carried = plan?.carried_over ?? [];
         $('carried-wrap').classList.toggle('hidden', !carried.length);
@@ -399,9 +427,8 @@ import '../styles/global.css';
         if (!el || !li) return;
         const id = li.dataset.task!;
         if (el.dataset.act === 'toggle') {
-          open.has(id) ? open.delete(id) : open.add(id);
+          selected = selected === id ? null : id;
           if (current) render(current);
-          if (open.has(id)) (li.parentElement?.querySelector(`[data-task="${id}"] [data-act="add"]`) as HTMLInputElement | null)?.focus();
         } else if (el.dataset.act === 'remove') {
           save(id, { subtasks: subtasksOf(id).filter((s) => s.id !== el.dataset.sub) });
         }
