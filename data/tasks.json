@@ -1,0 +1,11 @@
+{
+  "source": "tasks",
+  "week_of": "2026-11-02",
+  "tasks": [
+    { "id": "t-dbs-hw", "title": "DBS homework", "course": "DBS", "due": "2026-11-03T17:30", "type": "homework", "status": "todo", "assumed_due": true },
+    { "id": "t-sys-midterm", "title": "Study for Systems Programming midterm", "course": "Systems", "due": "2026-11-04T14:30", "type": "exam", "status": "todo", "assumed_due": true },
+    { "id": "t-genai-hw", "title": "Gen AI homework", "course": "Gen AI", "due": "2026-11-04T17:30", "type": "homework", "status": "todo", "assumed_due": true },
+    { "id": "t-dist-hw", "title": "Distributed Systems homework", "course": "Distributed", "due": "2026-11-05T23:59", "type": "homework", "status": "todo", "assumed_due": false },
+    { "id": "t-dist-quiz", "title": "Prep for Distributed Systems quiz", "course": "Distributed", "due": "2026-11-06T14:30", "type": "quiz", "status": "todo", "assumed_due": true }
+  ]
+}

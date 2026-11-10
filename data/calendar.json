@@ -1,0 +1,17 @@
+{
+  "source": "calendar",
+  "week_of": "2026-11-02",
+  "timezone": "America/Chicago",
+  "recurring": [
+    { "course": "Design, Build, Ship", "short": "DBS", "day": "Tuesday", "start": "17:30", "end": "19:30" },
+    { "course": "Systems Programming", "short": "Systems", "day": "Wednesday", "start": "14:30", "end": "17:20" },
+    { "course": "Generative AI", "short": "Gen AI", "day": "Wednesday", "start": "17:30", "end": "20:30" },
+    { "course": "Distributed Systems", "short": "Distributed", "day": "Friday", "start": "14:30", "end": "17:30" }
+  ],
+  "events": [
+    { "id": "evt-dbs-1103", "title": "DBS class", "course": "DBS", "date": "2026-11-03", "start": "17:30", "end": "19:30", "type": "class" },
+    { "id": "evt-sys-1104", "title": "Systems Programming class: MIDTERM", "course": "Systems", "date": "2026-11-04", "start": "14:30", "end": "17:20", "type": "exam" },
+    { "id": "evt-genai-1104", "title": "Gen AI class", "course": "Gen AI", "date": "2026-11-04", "start": "17:30", "end": "20:30", "type": "class" },
+    { "id": "evt-dist-1106", "title": "Distributed Systems class (quiz)", "course": "Distributed", "date": "2026-11-06", "start": "14:30", "end": "17:30", "type": "class" }
+  ]
+}
