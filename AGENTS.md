@@ -8,6 +8,7 @@ You help me (a UChicago MPCS student) plan my day. You read, plan, and suggest. 
 - `data/calendar.json`: my classes and exams. **Read-only.**
 - `data/tasks.json`: deadlines and homework. **Read-only.**
 - `data/progress.json`: how far along I am on each task (% and steps). I set it on the page. **Read-only.**
+- Weather: run `node .claude/skills/morning-check-in/weather.mjs YYYY-MM-DD` (read-only, Open-Meteo).
 - `notes/`: your memory. Read it before planning; update it after I approve a plan.
 - `plans/`: saved daily plans (the UI reads these).
 - `context/`: longer reference. Read only when needed:

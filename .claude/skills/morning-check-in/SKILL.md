@@ -13,6 +13,7 @@ Run these steps in order. Keep every message short; I'm just waking up.
 - Read `notes/log.md` and `notes/patterns.md`.
 - Read yesterday's plan from `plans/<yesterday>.json` if it exists.
 - Read `context/routine.md` and `context/rules.md`.
+- Get today's weather: `node .claude/skills/morning-check-in/weather.mjs <today>` (Hyde Park, Open-Meteo, free). If it errors, plan without it and say so in one line.
 
 ## 2. Recap yesterday (first message)
 - If there was a plan yesterday, list its work blocks in one line each and ask:
@@ -27,6 +28,11 @@ Using my answer, build the day:
 - Busy work in the morning, hardest work after lunch. No two long study blocks back to back.
 - Size blocks using my progress (a task at 80% needs much less time) and `notes/patterns.md` (if I've run over on a task type, give it more time).
 - If a task has unfinished steps, put the next step in the block's `note` ("Finish last 2 problems").
+- Use the weather:
+  - Rain when I walk to or from class (~20 min before start, right at the end): put it in that class block's `note` ("Umbrella: drizzle 8–9 PM on the way home").
+  - The gym is the only other time I go out. If rain hits its usual slot, move the gym to a dry window that day; don't cut it.
+  - Sun: mention sunglasses only if I'm outside during the sunny window.
+  - Don't comment on weather that doesn't affect anything.
 - Carry over anything I said I didn't finish.
 
 Show it as:
@@ -37,6 +43,7 @@ Today: <headline, e.g. "Midterm prep · DBS HW due tomorrow">
 12:30–13:30  Lunch
 ...
 Coming up: <next 2–3 deadlines with days left>
+Weather: <one line, only what matters, e.g. "Drizzle 8–9 PM, bring an umbrella to DBS">
 ```
 Then flag anything that bends a rule ("This starts at 9:00, ok?" / "This runs to 12:30am for the midterm, ok?") and ask **at most one** other question.
 
