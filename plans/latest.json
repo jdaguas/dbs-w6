@@ -1,0 +1,23 @@
+{
+  "date": "2026-11-02",
+  "day": "Monday",
+  "summary": "Put most of the day into the Systems midterm, with DBS in the morning and one Gen AI session.",
+  "recap": "No plan Sunday. Studied every day over the weekend.",
+  "blocks": [
+    { "start": "10:00", "end": "12:30", "title": "DBS homework", "kind": "work", "weight": "light", "task_id": "t-dbs-hw" },
+    { "start": "12:30", "end": "13:30", "title": "Lunch", "kind": "meal" },
+    { "start": "13:30", "end": "16:00", "title": "Systems midterm study", "kind": "work", "weight": "deep", "task_id": "t-sys-midterm" },
+    { "start": "16:00", "end": "16:30", "title": "Buffer", "kind": "buffer" },
+    { "start": "16:30", "end": "18:00", "title": "Gym", "kind": "gym" },
+    { "start": "18:00", "end": "19:00", "title": "Gen AI homework", "kind": "work", "weight": "light", "task_id": "t-genai-hw" },
+    { "start": "19:00", "end": "20:00", "title": "Dinner", "kind": "meal" },
+    { "start": "20:00", "end": "22:30", "title": "Systems midterm study: practice problems", "kind": "work", "weight": "deep", "task_id": "t-sys-midterm" }
+  ],
+  "deadlines": [
+    { "task_id": "t-dbs-hw", "title": "DBS homework", "due": "2026-11-03T17:30" },
+    { "task_id": "t-sys-midterm", "title": "Systems Programming midterm", "due": "2026-11-04T14:30" },
+    { "task_id": "t-genai-hw", "title": "Gen AI homework", "due": "2026-11-04T17:30" }
+  ],
+  "carried_over": [],
+  "exceptions": []
+}

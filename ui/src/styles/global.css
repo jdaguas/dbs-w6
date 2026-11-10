@@ -1,1 +1,5 @@
 @import "tailwindcss";
+
+@layer components {
+  .label { @apply mb-2 text-xs font-semibold uppercase tracking-wider text-stone-400; }
+}

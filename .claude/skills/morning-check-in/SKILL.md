@@ -30,7 +30,7 @@ Using my answer, build the day:
 
 Show it as:
 ```
-Today: <one-sentence point of the day>
+Today: <headline, e.g. "Midterm prep · DBS HW due tomorrow">
 
 10:00–12:00  DBS homework (light)
 12:30–13:30  Lunch

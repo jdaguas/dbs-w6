@@ -9,128 +9,206 @@ import '../styles/global.css';
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>Today</title>
   </head>
-  <body class="bg-stone-50 text-stone-900 antialiased">
-    <main class="mx-auto max-w-xl px-6 py-10">
-      <header class="mb-6">
-        <h1 class="text-3xl font-bold tracking-tight">Today</h1>
-        <p id="date" class="text-sm text-stone-500">Waiting for your check-in…</p>
-        <p id="summary" class="mt-3 text-stone-700"></p>
-      </header>
+  <body class="min-h-screen bg-gradient-to-b from-stone-100 to-stone-200 text-stone-900 antialiased">
+    <main class="mx-auto max-w-xl px-5 py-8">
+      <div class="rounded-3xl bg-white/80 p-6 shadow-sm ring-1 ring-stone-200 backdrop-blur">
+        <!-- Header -->
+        <header class="flex items-start justify-between gap-4">
+          <div>
+            <h1 id="title" class="text-4xl font-bold tracking-tight">Today</h1>
+            <p id="date" class="mt-1 text-stone-500">Loading…</p>
+          </div>
+          <nav class="flex gap-2 pt-2 text-sm">
+            <button id="prev" class="rounded-full px-3 py-1 ring-1 ring-stone-300 hover:bg-stone-100 disabled:opacity-30"></button>
+            <button id="next" class="rounded-full px-3 py-1 ring-1 ring-stone-300 hover:bg-stone-100 disabled:opacity-30"></button>
+          </nav>
+        </header>
+        <p id="focus" class="mt-4 hidden rounded-lg bg-stone-900 px-3 py-2 text-sm font-medium text-white"></p>
 
-      <section id="empty" class="rounded-xl border border-dashed border-stone-300 p-6 text-center text-stone-500">
-        No plan yet. Say <span class="font-mono text-stone-700">good morning</span> in Claude Code.
-      </section>
-
-      <div id="content" class="hidden space-y-6">
-        <section id="recap-wrap" class="hidden rounded-xl bg-white p-4 shadow-sm ring-1 ring-stone-200">
-          <h2 class="mb-1 text-xs font-semibold uppercase tracking-wide text-stone-400">Yesterday</h2>
-          <p id="recap" class="text-sm text-stone-700"></p>
+        <!-- Yesterday -->
+        <section id="recap-wrap" class="mt-6 hidden">
+          <h2 class="label">Yesterday</h2>
+          <p id="recap" class="text-sm text-stone-600"></p>
         </section>
 
-        <section>
-          <h2 class="mb-2 text-xs font-semibold uppercase tracking-wide text-stone-400">Schedule</h2>
-          <ol id="blocks" class="space-y-2"></ol>
+        <!-- Schedule -->
+        <section class="mt-6">
+          <div class="mb-2 flex items-baseline justify-between">
+            <h2 class="label !mb-0">Schedule</h2>
+            <span id="status" class="text-xs text-stone-400"></span>
+          </div>
+          <ol id="blocks" class="divide-y divide-stone-100 overflow-hidden rounded-2xl bg-white ring-1 ring-stone-200"></ol>
         </section>
 
-        <section id="deadlines-wrap" class="hidden">
-          <h2 class="mb-2 text-xs font-semibold uppercase tracking-wide text-stone-400">Coming up</h2>
-          <ul id="deadlines" class="space-y-1 text-sm"></ul>
+        <!-- Rules bent -->
+        <section id="exceptions-wrap" class="mt-4 hidden rounded-xl bg-amber-50 px-4 py-3 ring-1 ring-amber-200">
+          <h2 class="label !text-amber-700">Rules bent (you approved)</h2>
+          <ul id="exceptions" class="space-y-1 text-sm text-amber-900"></ul>
         </section>
 
-        <section id="carried-wrap" class="hidden">
-          <h2 class="mb-2 text-xs font-semibold uppercase tracking-wide text-stone-400">Carried over</h2>
-          <ul id="carried" class="space-y-1"></ul>
+        <!-- Tasks -->
+        <section class="mt-6">
+          <h2 class="label">Due</h2>
+          <ul id="tasks" class="divide-y divide-stone-100 overflow-hidden rounded-2xl bg-white ring-1 ring-stone-200"></ul>
+          <details id="past-wrap" class="mt-3 hidden text-sm text-stone-400">
+            <summary class="cursor-pointer select-none">Already due (<span id="past-count"></span>)</summary>
+            <ul id="past" class="mt-2 space-y-1 pl-4"></ul>
+          </details>
         </section>
 
-        <section id="exceptions-wrap" class="hidden">
-          <h2 class="mb-2 text-xs font-semibold uppercase tracking-wide text-stone-400">Rules bent today (approved)</h2>
-          <ul id="exceptions" class="space-y-1 text-sm text-amber-800"></ul>
+        <!-- Carried over -->
+        <section id="carried-wrap" class="mt-6 hidden">
+          <h2 class="label">Carried over</h2>
+          <ul id="carried" class="space-y-2"></ul>
         </section>
       </div>
-
-      <footer id="updated" class="mt-10 text-xs text-stone-400"></footer>
+      <p class="mt-4 text-center text-xs text-stone-400">Read-only. Plans come from your morning check-in in Claude Code.</p>
     </main>
 
     <script>
-      type Block = { start: string; end: string; title: string; kind: string; weight?: string };
-      type Plan = {
-        date: string; day?: string; summary?: string; recap?: string;
-        blocks: Block[];
-        deadlines?: { title: string; due: string }[];
-        carried_over?: string[]; exceptions?: string[];
+      type Block = { start: string; end: string; title: string; kind: string; weight?: string; note?: string; task_id?: string; course?: string };
+      type Task = { id: string; title: string; course: string; due: string; type: string; status: string };
+      type Event = { title: string; course: string; date: string; start: string; end: string; type: string };
+      type Data = {
+        date: string; today: string; weekOf: string; saved: string | null; planDates: string[];
+        plan: null | { summary?: string; recap?: string; blocks: Block[]; carried_over?: string[]; exceptions?: string[] };
+        events: Event[]; tasks: Task[];
       };
 
-      const STYLE: Record<string, string> = {
-        class: 'bg-indigo-50 ring-indigo-200 text-indigo-900',
-        exam: 'bg-rose-100 ring-rose-300 text-rose-900 font-semibold',
-        work: 'bg-white ring-stone-200',
-        meal: 'bg-emerald-50 ring-emerald-200 text-emerald-900',
-        gym: 'bg-sky-50 ring-sky-200 text-sky-900',
-        break: 'bg-stone-100 ring-stone-200 text-stone-600',
-        buffer: 'bg-stone-100 ring-stone-200 text-stone-500 italic',
+      const KIND: Record<string, string> = {
+        class: 'bg-indigo-500', exam: 'bg-rose-500', work: 'bg-stone-800', meal: 'bg-emerald-500',
+        gym: 'bg-sky-500', break: 'bg-stone-300', buffer: 'bg-stone-300',
+      };
+      const COURSE: Record<string, string> = {
+        DBS: 'bg-violet-100 text-violet-700', Systems: 'bg-rose-100 text-rose-700',
+        'Gen AI': 'bg-amber-100 text-amber-800', Distributed: 'bg-teal-100 text-teal-700',
       };
 
       const $ = (id: string) => document.getElementById(id)!;
-      const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
-
-      function to12(t: string) {
+      const esc = (s = '') => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+      const day = (iso: string, opts: Intl.DateTimeFormatOptions) => new Date(iso + 'T12:00').toLocaleDateString('en-US', opts);
+      const addDays = (iso: string, n: number) => {
+        const d = new Date(iso + 'T12:00'); d.setDate(d.getDate() + n);
+        return d.toISOString().slice(0, 10);
+      };
+      const daysBetween = (a: string, b: string) => Math.round((new Date(b + 'T12:00').getTime() - new Date(a + 'T12:00').getTime()) / 864e5);
+      function time(t: string) {
         const [h, m] = t.split(':').map(Number);
-        const hr = ((h + 11) % 12) + 1;
-        return `${hr}:${String(m).padStart(2, '0')}${h < 12 || h === 24 ? 'a' : 'p'}`;
+        const hh = h % 24;
+        return `${((hh + 11) % 12) + 1}:${String(m).padStart(2, '0')} ${hh < 12 ? 'AM' : 'PM'}`;
+      }
+      const pill = (course?: string) => course ? `<span class="rounded-full px-2 py-0.5 text-xs font-medium ${COURSE[course] ?? 'bg-stone-100 text-stone-600'}">${esc(course)}</span>` : '';
+
+      function row(b: Block, course?: string) {
+        return `<li class="flex gap-4 px-4 py-3">
+          <span class="w-20 shrink-0 pt-0.5 text-sm tabular-nums text-stone-500">${time(b.start)}</span>
+          <span class="mt-2 h-2 w-2 shrink-0 rounded-full ${KIND[b.kind] ?? KIND.work}"></span>
+          <div class="flex-1">
+            <div class="flex flex-wrap items-baseline gap-x-2">
+              <span class="${b.kind === 'exam' ? 'font-semibold text-rose-700' : 'font-medium'} ${b.kind === 'buffer' || b.kind === 'break' ? 'text-stone-400' : ''}">${esc(b.title)}</span>
+              <span class="text-xs text-stone-400">until ${time(b.end)}</span>
+            </div>
+            ${b.note ? `<p class="mt-0.5 text-sm text-stone-500">${esc(b.note)}</p>` : ''}
+          </div>
+          <div class="flex shrink-0 items-start gap-1 pt-0.5">
+            ${pill(course)}
+            ${b.weight ? `<span class="rounded-full bg-stone-100 px-2 py-0.5 text-xs text-stone-500">${esc(b.weight)}</span>` : ''}
+          </div>
+        </li>`;
       }
 
-      function list(wrap: string, el: string, items: string[] | undefined, render: (s: string) => string) {
-        $(wrap).classList.toggle('hidden', !items?.length);
-        $(el).innerHTML = (items ?? []).map(render).join('');
+      function render(d: Data) {
+        const isToday = d.date === d.today;
+        const offset = daysBetween(d.today, d.date);
+        $('title').textContent = isToday ? 'Today' : offset === -1 ? 'Yesterday' : offset === 1 ? 'Tomorrow' : day(d.date, { weekday: 'long' });
+        $('date').textContent = day(d.date, { weekday: 'long', month: 'long', day: 'numeric' });
+
+        // Day navigation across the data week.
+        const first = d.weekOf, last = addDays(d.weekOf, 6);
+        const prev = addDays(d.date, -1), next = addDays(d.date, 1);
+        ($('prev') as HTMLButtonElement).disabled = prev < first;
+        ($('next') as HTMLButtonElement).disabled = next > last;
+        $('prev').textContent = `‹ ${day(prev, { weekday: 'short' })}`;
+        $('next').textContent = `${day(next, { weekday: 'short' })} ›`;
+
+        const plan = d.plan;
+        $('focus').classList.toggle('hidden', !plan?.summary);
+        $('focus').textContent = plan?.summary ?? '';
+        $('recap-wrap').classList.toggle('hidden', !plan?.recap);
+        $('recap').textContent = plan?.recap ?? '';
+
+        // Schedule: the saved plan, or the raw calendar if there's no plan yet.
+        const taskCourse = Object.fromEntries(d.tasks.map((t) => [t.id, t.course]));
+        const todaysEvents = d.events.filter((e) => e.date === d.date);
+        if (plan) {
+          $('status').textContent = `Planned ${new Date(d.saved!).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`;
+          $('blocks').innerHTML = plan.blocks.map((b) => row(b, b.course ?? (b.task_id ? taskCourse[b.task_id] : undefined))).join('');
+        } else {
+          $('status').textContent = 'Not planned yet';
+          $('blocks').innerHTML = todaysEvents.length
+            ? todaysEvents.map((e) => row({ ...e, kind: e.type }, e.course)).join('')
+            : `<li class="px-4 py-6 text-center text-sm text-stone-400">No classes. ${isToday ? 'Say <span class="font-mono text-stone-600">good morning</span> in Claude Code to plan the day.' : ''}</li>`;
+        }
+
+        const ex = plan?.exceptions ?? [];
+        $('exceptions-wrap').classList.toggle('hidden', !ex.length);
+        $('exceptions').innerHTML = ex.map((s) => `<li>${esc(s)}</li>`).join('');
+
+        // Tasks, with whether today's plan covers them.
+        const planned = new Map<string, Block>();
+        for (const b of plan?.blocks ?? []) if (b.task_id && !planned.has(b.task_id)) planned.set(b.task_id, b);
+        const sorted = [...d.tasks].sort((a, b) => a.due.localeCompare(b.due));
+        const upcoming = sorted.filter((t) => t.due.slice(0, 10) >= d.date);
+        const past = sorted.filter((t) => t.due.slice(0, 10) < d.date);
+
+        $('tasks').innerHTML = upcoming.map((t) => {
+          const n = daysBetween(d.date, t.due.slice(0, 10));
+          const when = n === 0 ? `Today ${time(t.due.slice(11, 16))}` : n === 1 ? `Tomorrow ${time(t.due.slice(11, 16))}` : `${day(t.due.slice(0, 10), { weekday: 'short' })} ${time(t.due.slice(11, 16))}`;
+          const b = planned.get(t.id);
+          const cover = !plan ? '' : b
+            ? `<span class="text-xs text-emerald-700">Planned ${time(b.start)}</span>`
+            : n <= 1 ? `<span class="text-xs font-medium text-amber-700">Not scheduled today</span>` : '';
+          return `<li class="flex items-center gap-3 px-4 py-3">
+            <span class="h-4 w-4 shrink-0 rounded-full ring-2 ring-stone-300"></span>
+            <div class="flex-1">
+              <div class="font-medium">${esc(t.title)}</div>
+              <div class="flex gap-3">${cover}</div>
+            </div>
+            ${pill(t.course)}
+            <span class="w-28 shrink-0 text-right text-sm ${n <= 1 ? 'font-medium text-rose-600' : 'text-stone-500'}">${when}</span>
+          </li>`;
+        }).join('') || `<li class="px-4 py-6 text-center text-sm text-stone-400">Nothing else due this week.</li>`;
+
+        $('past-wrap').classList.toggle('hidden', !past.length);
+        $('past-count').textContent = String(past.length);
+        $('past').innerHTML = past.map((t) => `<li>${esc(t.title)}</li>`).join('');
+
+        const carried = plan?.carried_over ?? [];
+        $('carried-wrap').classList.toggle('hidden', !carried.length);
+        $('carried').innerHTML = carried.map((s) => `<li class="rounded-xl border border-dashed border-stone-300 px-4 py-2 text-sm text-stone-600">${esc(s)}</li>`).join('');
       }
 
-      function render(plan: Plan, updated: string) {
-        $('empty').classList.add('hidden');
-        $('content').classList.remove('hidden');
-
-        const d = new Date(plan.date + 'T12:00');
-        $('date').textContent = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-        $('summary').textContent = plan.summary ?? '';
-
-        $('recap-wrap').classList.toggle('hidden', !plan.recap);
-        $('recap').textContent = plan.recap ?? '';
-
-        $('blocks').innerHTML = plan.blocks.map((b) => `
-          <li class="flex gap-4 rounded-lg px-4 py-3 shadow-sm ring-1 ${STYLE[b.kind] ?? STYLE.work}">
-            <span class="w-28 shrink-0 font-mono text-sm tabular-nums opacity-70">${to12(b.start)}–${to12(b.end)}</span>
-            <span class="flex-1">${esc(b.title)}</span>
-            ${b.weight ? `<span class="text-xs uppercase tracking-wide opacity-50">${esc(b.weight)}</span>` : ''}
-          </li>`).join('');
-
-        const today = new Date(plan.date + 'T00:00');
-        const deadlines = (plan.deadlines ?? []).map((x) => {
-          const days = Math.round((new Date(x.due.slice(0, 10) + 'T00:00').getTime() - today.getTime()) / 864e5);
-          const when = days <= 0 ? 'today' : days === 1 ? 'tomorrow' : `in ${days} days`;
-          return `<li class="flex justify-between"><span>${esc(x.title)}</span><span class="${days <= 1 ? 'font-semibold text-rose-700' : 'text-stone-500'}">${when}</span></li>`;
-        });
-        $('deadlines-wrap').classList.toggle('hidden', !deadlines.length);
-        $('deadlines').innerHTML = deadlines.join('');
-
-        list('carried-wrap', 'carried', plan.carried_over, (s) =>
-          `<li class="rounded-lg border border-stone-300 px-4 py-2 text-sm text-stone-600">${esc(s)}</li>`);
-        list('exceptions-wrap', 'exceptions', plan.exceptions, (s) => `<li>• ${esc(s)}</li>`);
-
-        $('updated').textContent = `Plan saved ${new Date(updated).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`;
-      }
-
+      // Follow the harness's "today" until the user navigates; then stay on the chosen day.
+      let viewing: string | null = null;
       let last = '';
-      async function poll() {
+      async function load() {
         try {
-          const res = await fetch('/api/plan.json', { cache: 'no-store' });
-          const { plan, updated } = await res.json();
-          if (plan && updated !== last) {
-            last = updated;
-            render(plan, updated);
-          }
+          const res = await fetch(`/api/plan.json${viewing ? `?date=${viewing}` : ''}`, { cache: 'no-store' });
+          const text = await res.text();
+          if (text !== last) { last = text; render(JSON.parse(text)); }
         } catch {}
       }
-      poll();
-      setInterval(poll, 2000);
+      function go(n: number) {
+        const d = JSON.parse(last) as Data;
+        viewing = addDays(d.date, n);
+        if (viewing === d.today) viewing = null;
+        load();
+      }
+      $('prev').addEventListener('click', () => go(-1));
+      $('next').addEventListener('click', () => go(1));
+      $('title').addEventListener('click', () => { viewing = null; load(); });
+      load();
+      setInterval(load, 2000);
     </script>
   </body>
 </html>

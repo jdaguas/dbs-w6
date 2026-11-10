@@ -6,10 +6,10 @@ Save each approved plan to `plans/YYYY-MM-DD.json`. Also copy it to `plans/lates
 {
   "date": "2026-11-02",
   "day": "Monday",
-  "summary": "One sentence: the point of today.",
-  "recap": "Short recap of yesterday (from the morning check-in).",
+  "summary": "Midterm prep · DBS HW due tomorrow",
+  "recap": "Studied ~2 hrs Sat and Sun for the midterm.",
   "blocks": [
-    { "start": "10:00", "end": "12:00", "title": "DBS homework", "kind": "work", "weight": "light", "task_id": "t-dbs-hw" },
+    { "start": "10:00", "end": "12:00", "title": "DBS homework", "kind": "work", "weight": "light", "task_id": "t-dbs-hw", "note": "Finish and submit before Tuesday class" },
     { "start": "12:30", "end": "13:30", "title": "Lunch", "kind": "meal" },
     { "start": "17:30", "end": "19:30", "title": "DBS class", "kind": "class" },
     { "start": "20:00", "end": "21:00", "title": "Dinner", "kind": "meal" }
@@ -22,6 +22,15 @@ Save each approved plan to `plans/YYYY-MM-DD.json`. Also copy it to `plans/lates
 }
 ```
 
+## Writing for the page
+The plan is shown on a page, not in chat. Write like a calendar, not a conversation.
+- `summary`: a headline under 10 words, fragments joined by `·`. No "I", "you", "we", or advice verbs ("put", "try", "make sure").
+  Good: `Midterm prep · DBS HW due tomorrow`. Bad: `Put most of the day into the Systems midterm.`
+- `recap`: facts only, past tense, one line.
+- `note` (optional, per block): a concrete detail, under 10 words. e.g. `Past midterm, chapters 3–5`.
+- Add `task_id` to every work block so the page can show which deadlines today's plan covers.
+
+## Fields
 - `kind`: one of `work`, `class`, `exam`, `meal`, `gym`, `break`, `buffer`.
 - Times are 24-hour `HH:MM`, sorted, no overlaps. After midnight, keep counting: `24:30` = 12:30am, `25:00` = 1:00am.
 - Include class blocks from the calendar. Only a `meal` may overlap a class, and only Gen AI on Wednesday.
