@@ -9,64 +9,64 @@ import '../styles/global.css';
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>Today</title>
   </head>
-  <body class="min-h-screen bg-gradient-to-b from-stone-100 to-stone-200 text-stone-900 antialiased">
+  <body class="min-h-screen bg-gradient-to-b from-[#8aa5c0] via-[#7f9bb8] to-[#6f8cab] text-slate-900 antialiased">
     <main class="mx-auto grid max-w-4xl items-start gap-5 px-5 py-8 md:grid-cols-[minmax(0,1fr)_15rem]">
       <!-- Side module: what to bring today (whole day, not just now) -->
       <aside class="order-first space-y-5 md:sticky md:top-8 md:col-start-2 md:row-start-1">
-      <section id="weather" class="rounded-3xl bg-white/80 p-5 shadow-sm ring-1 ring-stone-200 backdrop-blur">
+      <section id="weather" class="rounded-3xl bg-[#dde6ef]/85 p-5 shadow-sm ring-1 ring-slate-400/30 backdrop-blur">
         <h2 class="label">Before you leave</h2>
-        <p id="w-temp" class="text-sm text-stone-500">Checking the weather…</p>
+        <p id="w-temp" class="text-sm text-slate-600">Checking the weather…</p>
         <ul id="w-items" class="mt-4 space-y-4"></ul>
         <div id="w-strip-wrap" class="mt-5 hidden">
-          <div class="mb-1 flex justify-between text-[10px] uppercase tracking-wider text-stone-400"><span>Rain chance</span><span>9a–11p</span></div>
+          <div class="mb-1 flex justify-between text-[10px] uppercase tracking-wider text-slate-500"><span>Rain chance</span><span>9a–11p</span></div>
           <div id="w-strip" class="flex h-10 items-end gap-[2px]"></div>
         </div>
-        <p class="mt-4 text-[10px] text-stone-400">Hyde Park · Open-Meteo</p>
+        <p class="mt-4 text-[10px] text-slate-500">Hyde Park · Open-Meteo</p>
       </section>
 
       <!-- Daily quote: same all day, new each day -->
-      <section class="rounded-3xl bg-white/80 p-5 shadow-sm ring-1 ring-stone-200 backdrop-blur">
+      <section class="rounded-3xl bg-[#dde6ef]/85 p-5 shadow-sm ring-1 ring-slate-400/30 backdrop-blur">
         <h2 class="label">Today’s quote</h2>
         <blockquote>
-          <p id="q-text" class="font-serif text-lg leading-snug text-stone-800"></p>
-          <footer id="q-by" class="mt-3 text-xs text-stone-500"></footer>
+          <p id="q-text" class="font-serif text-lg leading-snug text-slate-800"></p>
+          <footer id="q-by" class="mt-3 text-xs text-slate-600"></footer>
         </blockquote>
       </section>
       </aside>
 
-      <div class="rounded-3xl bg-white/80 p-6 shadow-sm ring-1 ring-stone-200 backdrop-blur md:col-start-1 md:row-start-1">
+      <div class="rounded-3xl bg-[#dde6ef]/85 p-6 shadow-sm ring-1 ring-slate-400/30 backdrop-blur md:col-start-1 md:row-start-1">
         <!-- Header -->
         <header class="flex items-start justify-between gap-4">
           <div>
             <h1 id="title" class="cursor-pointer text-4xl font-bold tracking-tight">Today</h1>
-            <p id="date" class="mt-1 text-stone-500">Loading…</p>
+            <p id="date" class="mt-1 text-slate-600">Loading…</p>
           </div>
           <nav class="flex gap-2 pt-2 text-sm">
-            <button id="prev" class="rounded-full px-3 py-1 ring-1 ring-stone-300 hover:bg-stone-100 disabled:opacity-30"></button>
-            <button id="next" class="rounded-full px-3 py-1 ring-1 ring-stone-300 hover:bg-stone-100 disabled:opacity-30"></button>
+            <button id="prev" class="rounded-full px-3 py-1 ring-1 ring-slate-400/60 hover:bg-white/30 disabled:opacity-30"></button>
+            <button id="next" class="rounded-full px-3 py-1 ring-1 ring-slate-400/60 hover:bg-white/30 disabled:opacity-30"></button>
           </nav>
         </header>
-        <p id="focus" class="mt-4 hidden rounded-lg bg-stone-900 px-3 py-2 text-sm font-medium text-white"></p>
+        <p id="focus" class="mt-4 hidden rounded-lg bg-slate-700 px-3 py-2 text-sm font-medium text-white"></p>
 
         <!-- Yesterday -->
         <section id="recap-wrap" class="mt-6 hidden">
           <h2 class="label">Yesterday</h2>
-          <p id="recap" class="text-sm text-stone-600"></p>
+          <p id="recap" class="text-sm text-slate-700"></p>
         </section>
 
         <!-- Schedule -->
         <section class="mt-6">
           <div class="mb-2 flex items-baseline justify-between">
             <h2 class="label !mb-0">Schedule</h2>
-            <span id="status" class="text-xs text-stone-400"></span>
+            <span id="status" class="text-xs text-slate-500"></span>
           </div>
-          <div id="sky" class="relative overflow-hidden rounded-2xl p-2 ring-1 ring-stone-200 transition-[background] duration-1000">
+          <div id="sky" class="relative overflow-hidden rounded-2xl p-2 ring-1 ring-slate-400/30 transition-[background] duration-1000">
             <div id="orb" class="pointer-events-none absolute rounded-full transition-all duration-1000"></div>
             <ol id="blocks" class="relative space-y-2"></ol>
             <!-- The line is thin; the wrapper gives a taller invisible hover zone. Time shows only on hover. -->
             <div id="nowbar" class="group absolute inset-x-0 z-10 hidden -translate-y-1/2 cursor-default py-2 transition-[top] duration-1000">
               <div class="relative h-0.5 bg-rose-500/40 shadow-[0_0_6px_rgba(244,63,94,.25)] transition-colors group-hover:bg-rose-500/80">
-                <span class="absolute -left-0.5 -top-[5px] h-3 w-3 rounded-full bg-rose-500/60 ring-2 ring-white/60"></span>
+                <span class="absolute -left-0.5 -top-[5px] h-3 w-3 rounded-full bg-rose-500/60 ring-2 ring-slate-400/30"></span>
                 <span id="nowlabel" class="pointer-events-none absolute -top-7 left-3 rounded-full bg-rose-500 px-2 py-0.5 text-xs font-semibold text-white opacity-0 shadow transition-opacity duration-150 group-hover:opacity-100"></span>
               </div>
             </div>
@@ -83,10 +83,10 @@ import '../styles/global.css';
         <section class="mt-6">
           <div class="mb-2 flex items-baseline justify-between">
             <h2 class="label !mb-0">Due</h2>
-            <span class="text-xs text-stone-400">Tap a task to update progress</span>
+            <span class="text-xs text-slate-500">Tap a task to update progress</span>
           </div>
-          <ul id="tasks" class="divide-y divide-stone-100 overflow-hidden rounded-2xl bg-white ring-1 ring-stone-200"></ul>
-          <details id="past-wrap" class="mt-3 hidden text-sm text-stone-400">
+          <ul id="tasks" class="divide-y divide-slate-300/50 overflow-hidden rounded-2xl bg-[#e6edf4]/80 ring-1 ring-slate-400/30"></ul>
+          <details id="past-wrap" class="mt-3 hidden text-sm text-slate-500">
             <summary class="cursor-pointer select-none">Already due (<span id="past-count"></span>)</summary>
             <ul id="past" class="mt-2 space-y-1 pl-4"></ul>
           </details>
@@ -98,7 +98,7 @@ import '../styles/global.css';
           <ul id="carried" class="space-y-2"></ul>
         </section>
       </div>
-      <p class="text-center text-xs text-stone-400 md:col-start-1">Plans come from your morning check-in in Claude Code. Progress is yours; Claude only reads it.</p>
+      <p class="text-center text-xs text-slate-700 md:col-start-1">Plans come from your morning check-in in Claude Code. Progress is yours; Claude only reads it.</p>
     </main>
 
     <script>
@@ -133,7 +133,7 @@ import '../styles/global.css';
         const hh = h % 24;
         return `${((hh + 11) % 12) + 1}:${String(m).padStart(2, '0')} ${hh < 12 ? 'AM' : 'PM'}`;
       }
-      const pill = (course?: string) => course ? `<span class="rounded-full px-2 py-0.5 text-xs font-medium ${COURSE[course] ?? 'bg-stone-100 text-stone-600'}">${esc(course)}</span>` : '';
+      const pill = (course?: string) => course ? `<span class="rounded-full px-2 py-0.5 text-xs font-medium ${COURSE[course] ?? 'bg-slate-200 text-slate-700'}">${esc(course)}</span>` : '';
 
       // ---------- Sky: color and sun/moon position for a time of day ----------
       // Chicago, early November: sunrise ~6:25am, sunset ~4:40pm.
@@ -244,9 +244,9 @@ import '../styles/global.css';
 
       // ---------- Schedule rows ----------
       function row(b: Block, course: string | undefined, type: string | undefined) {
-        const sub = 'text-stone-500';
+        const sub = 'text-slate-600';
         const exam = b.kind === 'exam';
-        return `<li data-start="${b.start}" data-end="${b.end}" class="flex items-start gap-3 rounded-xl bg-white/80 px-4 py-3 text-stone-900 shadow-sm backdrop-blur-sm">
+        return `<li data-start="${b.start}" data-end="${b.end}" class="flex items-start gap-3 rounded-xl bg-[#e6edf4]/85 px-4 py-3 text-slate-900 shadow-sm backdrop-blur-sm">
           <span class="w-[4.5rem] shrink-0 pt-0.5 text-sm tabular-nums ${sub}">${time(b.start)}</span>
           <div class="min-w-0 flex-1">
             <div class="flex flex-wrap items-baseline gap-x-2">
@@ -267,7 +267,7 @@ import '../styles/global.css';
         const r = 8, c = 2 * Math.PI * r;
         const color = pct >= 100 ? '#059669' : '#44403c';
         return `<svg width="22" height="22" viewBox="0 0 22 22" class="shrink-0 -rotate-90">
-          <circle cx="11" cy="11" r="${r}" fill="none" stroke="#e7e5e4" stroke-width="3"/>
+          <circle cx="11" cy="11" r="${r}" fill="none" stroke="#cbd5e1" stroke-width="3"/>
           ${pct > 0 ? `<circle cx="11" cy="11" r="${r}" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round"
             stroke-dasharray="${(pct / 100) * c} ${c}"/>` : ''}</svg>`;
       }
@@ -287,11 +287,11 @@ import '../styles/global.css';
         const imp = IMPORTANCE[t.type];
 
         return `<li data-task="${t.id}" class="border-l-4 ${imp ? imp.edge : 'border-l-transparent'}">
-          <button data-act="toggle" class="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-stone-50">
+          <button data-act="toggle" class="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-[#d3dee9]/60">
             ${ring(p.percent)}
             <div class="min-w-0 flex-1">
-              <div class="font-medium ${doneTask ? 'text-stone-400 line-through' : ''}">${esc(t.title)}</div>
-              <div class="flex flex-wrap gap-x-3 text-xs text-stone-500">
+              <div class="font-medium ${doneTask ? 'text-slate-500 line-through' : ''}">${esc(t.title)}</div>
+              <div class="flex flex-wrap gap-x-3 text-xs text-slate-600">
                 <span class="tabular-nums">${p.percent}%</span>
                 ${p.subtasks.length ? `<span>${left ? `${left} step${left > 1 ? 's' : ''} left` : 'All steps done'}</span>` : ''}
                 ${cover}
@@ -299,23 +299,23 @@ import '../styles/global.css';
             </div>
             <div class="flex shrink-0 flex-col items-end gap-1">
               <div class="flex gap-1">${importanceBadge(t.type)}${pill(t.course)}</div>
-              <span class="text-sm ${n <= 1 && !doneTask ? 'font-medium text-rose-600' : 'text-stone-500'}">${when}</span>
+              <span class="text-sm ${n <= 1 && !doneTask ? 'font-medium text-rose-600' : 'text-slate-600'}">${when}</span>
             </div>
           </button>
-          ${isOpen ? `<div class="space-y-3 bg-stone-50 px-4 pb-4 pt-2">
+          ${isOpen ? `<div class="space-y-3 bg-[#d3dee9] px-4 pb-4 pt-2">
             <label class="flex items-center gap-3 text-sm">
-              <span class="w-20 text-stone-500">Progress</span>
-              <input data-act="percent" type="range" min="0" max="100" step="5" value="${p.percent}" class="flex-1 accent-stone-800"/>
+              <span class="w-20 text-slate-600">Progress</span>
+              <input data-act="percent" type="range" min="0" max="100" step="5" value="${p.percent}" class="flex-1 accent-slate-700"/>
               <output class="w-10 text-right tabular-nums font-medium">${p.percent}%</output>
             </label>
             <ul class="space-y-1">
               ${p.subtasks.map((s) => `<li class="flex items-center gap-2 text-sm">
-                <input data-act="check" data-sub="${s.id}" type="checkbox" ${s.done ? 'checked' : ''} class="h-4 w-4 accent-stone-800"/>
-                <span class="flex-1 ${s.done ? 'text-stone-400 line-through' : ''}">${esc(s.title)}</span>
-                <button data-act="remove" data-sub="${s.id}" class="px-1 text-stone-400 hover:text-rose-600" aria-label="Remove">×</button>
+                <input data-act="check" data-sub="${s.id}" type="checkbox" ${s.done ? 'checked' : ''} class="h-4 w-4 accent-slate-700"/>
+                <span class="flex-1 ${s.done ? 'text-slate-500 line-through' : ''}">${esc(s.title)}</span>
+                <button data-act="remove" data-sub="${s.id}" class="px-1 text-slate-500 hover:text-rose-600" aria-label="Remove">×</button>
               </li>`).join('')}
             </ul>
-            <input data-act="add" type="text" placeholder="Add a step, e.g. Finish last 2 problems" class="w-full rounded-lg bg-white px-3 py-2 text-sm ring-1 ring-stone-200 focus:outline-none focus:ring-stone-400"/>
+            <input data-act="add" type="text" placeholder="Add a step, e.g. Finish last 2 problems" class="w-full rounded-lg bg-[#eef3f8] px-3 py-2 text-sm ring-1 ring-slate-300 focus:outline-none focus:ring-slate-500"/>
           </div>` : ''}
         </li>`;
       }
@@ -352,7 +352,7 @@ import '../styles/global.css';
           $('status').textContent = 'Not planned yet';
           $('blocks').innerHTML = todaysEvents.length
             ? todaysEvents.map((e) => row({ ...e, kind: e.type }, e.course, e.type)).join('')
-            : `<li class="rounded-xl bg-white/80 px-4 py-6 text-center text-sm text-stone-400">No classes. ${isToday ? 'Say <span class="font-mono text-stone-600">good morning</span> in Claude Code to plan the day.' : ''}</li>`;
+            : `<li class="rounded-xl bg-[#e6edf4]/85 px-4 py-6 text-center text-sm text-slate-500">No classes. ${isToday ? 'Say <span class="font-mono text-slate-700">good morning</span> in Claude Code to plan the day.' : ''}</li>`;
         }
 
         const ex = plan?.exceptions ?? [];
@@ -366,7 +366,7 @@ import '../styles/global.css';
         const past = sorted.filter((t) => t.due.slice(0, 10) < d.date);
 
         $('tasks').innerHTML = upcoming.map((t) => taskItem(t, d, planned)).join('')
-          || `<li class="px-4 py-6 text-center text-sm text-stone-400">Nothing else due this week.</li>`;
+          || `<li class="px-4 py-6 text-center text-sm text-slate-500">Nothing else due this week.</li>`;
 
         $('past-wrap').classList.toggle('hidden', !past.length);
         $('past-count').textContent = String(past.length);
@@ -374,7 +374,7 @@ import '../styles/global.css';
 
         const carried = plan?.carried_over ?? [];
         $('carried-wrap').classList.toggle('hidden', !carried.length);
-        $('carried').innerHTML = carried.map((s) => `<li class="rounded-xl border border-dashed border-stone-300 px-4 py-2 text-sm text-stone-600">${esc(s)}</li>`).join('');
+        $('carried').innerHTML = carried.map((s) => `<li class="rounded-xl border border-dashed border-slate-400 px-4 py-2 text-sm text-slate-700">${esc(s)}</li>`).join('');
         requestAnimationFrame(updateNow);
         loadWeather(d);
         const q = quoteFor(d.date);
@@ -448,7 +448,7 @@ import '../styles/global.css';
       function item(icon: string, title: string, detail: string) {
         return `<li class="flex items-start gap-3">
           <span class="text-3xl leading-none">${icon}</span>
-          <div><div class="font-semibold">${title}</div><div class="text-xs text-stone-500">${detail}</div></div>
+          <div><div class="font-semibold">${title}</div><div class="text-xs text-slate-600">${detail}</div></div>
         </li>`;
       }
 
