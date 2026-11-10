@@ -17,6 +17,8 @@
 
 On long days (Tue/Wed/Fri), the extra dinner after class is the last meal. On Wed, regular dinner can happen **during Gen AI class** (I sometimes eat in class); the post-class dinner still stays.
 
+**Wednesday pattern:** heavy lunch before Systems (finish by ~2:00), snacks during Gen AI (plan as a `meal` block titled "Snacks", overlapping class), then a real meal right after Gen AI ends (~8:45).
+
 ## When I work best
 - **Mornings:** busy work that doesn't need much thinking. DBS homework fits here.
 - **After lunch:** best focus. Exam study and Distributed homework go here.

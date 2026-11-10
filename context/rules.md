@@ -3,7 +3,7 @@
 ## Enforced by hooks (Claude Code blocks these)
 1. **No edits to `data/`.** Any write or edit to `data/calendar.json`, `data/tasks.json`, or `data/progress.json` is blocked. If I want an event moved, explain how I'd do it.
 2. **No overlapping class.** Every plan block is checked against class/exam times. One exception: on Wednesday, a `meal` block may overlap Gen AI (I sometimes eat during class).
-3. **Last meal stays.** Every saved plan needs an evening meal that starts after the day's last class (the extra dinner on Tue/Wed/Fri). Work after that meal is fine.
+3. **Last meal stays, unless I skip it.** Every saved plan needs an evening meal that starts after the day's last class (the extra dinner on Tue/Wed/Fri). Work after that meal is fine. If **I** say to skip it (e.g. "big lunch before the midterm, nothing after"), drop it and record my approval in `exceptions`. Never suggest skipping it yourself.
 
 ## Decided by Claude (with my approval)
 - **Late nights:** default stop is 10:30pm. Before an exam or a big deadline you may propose working later (I did this for the Systems midterm). Say why, and how late. Never past 1:00am.

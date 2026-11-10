@@ -96,10 +96,13 @@ for (let i = 0; i < sorted.length; i++) {
   }
 }
 
-// 3. Never skip the last meal: an evening meal must start after the day's last class.
+// 3. Last meal: an evening meal must start after the day's last class,
+//    unless I said to skip it and that approval is recorded in "exceptions".
+const exceptions = Array.isArray(plan.exceptions) ? plan.exceptions : [];
 const lastClassEnd = Math.max(17 * 60, ...fixed.map((c) => c.e));
-if (!blocks.some((b) => b.kind === 'meal' && b.s >= lastClassEnd)) {
-  errors.push(`no last meal. Add a meal block starting at or after ${fmt(lastClassEnd)}.`);
+const skipApproved = exceptions.some((x) => /(skip|no|without).*(meal|dinner)|(meal|dinner).*(skip|approved)/i.test(String(x)));
+if (!blocks.some((b) => b.kind === 'meal' && b.s >= lastClassEnd) && !skipApproved) {
+  errors.push(`no last meal. Add a meal block starting at or after ${fmt(lastClassEnd)}, or, only if I told you to skip it, record that in "exceptions" (e.g. "Skipping dinner after Gen AI, approved").`);
 }
 
 // 4. Hard limits on the day, and bent rules must be written down.
@@ -108,7 +111,7 @@ const latest = Math.max(...blocks.map((b) => b.e));
 if (earliest < 9 * 60) errors.push(`starts at ${fmt(earliest)}; nothing may start before 9:00.`);
 if (latest > 25 * 60) errors.push(`runs to ${fmt(latest - 24 * 60)}am; nothing may run past 1:00am.`);
 const bent = earliest < 10 * 60 || latest > 22 * 60 + 30;
-if (bent && !(Array.isArray(plan.exceptions) && plan.exceptions.length)) {
+if (bent && !exceptions.length) {
   errors.push('plan starts before 10:00 or runs past 10:30pm. Ask me first, then record my approval in "exceptions".');
 }
 
